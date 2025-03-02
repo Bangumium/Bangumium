@@ -28,6 +28,8 @@ Pywebview + Vue.js
 
 在 [GitHub Releases](https://github.com/Bangumium/Bangumium/releases) 下载编译完成的软件。
 
+**Windows 用户可能需要自行前往 [此处](https://developer.microsoft.com/en-us/microsoft-edge/webview2) 下载 Microsoft Edge Webview2 运行时才可以正常运行。**
+
 ## 参与开发
 
 ### 安装 NPM 和 PIP 依赖
