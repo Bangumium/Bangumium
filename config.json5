@@ -1,0 +1,29 @@
+{
+    // https://pywebview.flowrl.com/guide/web_engine.html
+    defaultWebEngine: {
+        linux: 'gtk',
+        win32: 'edgechromium'
+    },
+    appName: 'Bangumium',
+    appVersion: '0.9.0',
+    // Keep the version number as 1.0.0. Modification of User-Agent string may cause the cookies to expire in a sudden.
+    userAgent: 'Bangumium (1.0.0)',
+    devModeLoadFrom: 'http://localhost:5173',
+    prodModeLoadFrom: './frontend_dist/index.html',
+    devModeDataDirPath: {
+        win32: '%LOCALAPPDATA%\\BangumiumDev\\',
+        linux: '$HOME/.config/BangumiumDev/',
+        darwin: '$HOME/Library/Application Support/BangumiumDev/'
+    },
+    prodModeDataDirPath: {
+        win32: '%LOCALAPPDATA%\\BangumiumConfig\\',
+        linux: '$HOME/.config/BangumiumConfig/',
+        darwin: '$HOME/Library/Application Support/BangumiumConfig/'
+    },
+    bangumiOauthApplication: {
+        app_id: 'bgm250263bf99fc6b541',
+        app_secret: '97619bd373ef64eb905d86d00ad8a41e',
+        cb: 'https://baiyuanneko.github.io/bangumi_callback/'
+    }
+    
+}

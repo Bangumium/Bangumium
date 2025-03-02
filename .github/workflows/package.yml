@@ -1,0 +1,108 @@
+name: Package release
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+env:
+  RELEASE_VERSION: ${{ github.ref_name }}
+
+jobs:
+  Package:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-13]
+        include:
+          - os: ubuntu-latest
+            build_script: ./build.sh
+            artifact_name: Linux-Artifacts
+          - os: windows-latest
+            build_script: ./build_win.sh
+            artifact_name: Windows-Artifacts
+          - os: macos-latest
+            build_script: ./build.sh
+            artifact_name: macOS-ARM-Artifacts
+          - os: macos-13
+            build_script: ./build.sh
+            artifact_name: macOS-Intel-Artifacts
+
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install Node.js Packages
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install System Dependencies for Python Packages
+        # https://github.com/pygobject/pycairo/issues/386#issuecomment-2397660932
+        # https://github.com/dlenski/gp-saml-gui/issues/101#issuecomment-2172468497
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get install -y libcairo2-dev pkg-config python3-dev libgirepository1.0-dev glib-networking
+
+      - name: Install Python Packages
+        if: matrix.os == 'ubuntu-latest'
+        run: pip install -r requirements_linux.txt
+        
+      - name: Install Python Packages
+        if: matrix.os != 'ubuntu-latest'
+        run: pip install -r requirements.txt
+
+    
+      - name: Build package
+        shell: bash
+        run: |
+          ${{ matrix.build_script }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: dist/
+          if-no-files-found: error
+
+  Release:
+    needs: Package
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/
+
+      - name: Prepare release
+        working-directory: ./dist
+        run: |
+          ls -lh
+          mv -f Linux-Artifacts/bangumium ./bangumium-linux
+          mv -f Windows-Artifacts/bangumium.exe ./bangumium-windows.exe
+          mv -f macOS-ARM-Artifacts/bangumium ./bangumium-macos-arm
+          mv -f macOS-Intel-Artifacts/bangumium ./bangumium-macos-intel
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          body: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/bangumium-linux
+            dist/bangumium-windows.exe
+            dist/bangumium-macos-arm
+            dist/bangumium-macos-intel

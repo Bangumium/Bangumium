@@ -1,0 +1,6 @@
+venv/
+build/
+dist/
+frontend_dist/
+main.spec
+bangumium.spec

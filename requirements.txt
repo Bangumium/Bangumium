@@ -1,0 +1,10 @@
+pywebview; platform_system != "Linux"
+pywebview[gtk]; platform_system == "Linux"
+json5
+httpx
+googletrans
+beautifulsoup4
+pystray
+Pillow
+notify_py
+pyinstaller
