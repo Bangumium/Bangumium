@@ -32,7 +32,6 @@ const isPrivate = ref(false)
 function setSubject(id: number, subjectInfoFallback: object) {
   loading.value = true;
   window.pywebview.api.getCollectStatusBySubjectId(id).then((result) => {
-
     collection.value = result;
     loading.value = false;
     verbList.value = getEditCollectVerbList(result.subject.type);
@@ -130,8 +129,9 @@ defineExpose({ openModal, closeModal, setSubject });
           <br />
           <input type="text" placeholder="标签" class="input input-bordered w-full" v-model="tag" />
           <br /><br />
-          <p>常用标签：<span v-for="(tag, index) of collection.subject.tags" :key="index" @click="addTag(tag.name)"><span
-                v-if="index < 10"><button class="btn btn-primary btn-outline btn-sm">{{ tag.name
+          <p v-if="collection.subject">常用标签：<span v-for="(tag, index) of collection.subject.tags" :key="index"
+              @click="addTag(tag.name)"><span v-if="index < 10"><button class="btn btn-primary btn-outline btn-sm">{{
+                tag.name
                   }}</button></span>&nbsp;</span></p>
           <br /><br />
           <p>吐槽</p>
