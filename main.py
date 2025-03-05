@@ -14,6 +14,8 @@ from notifypy import Notify
 import threading
 import webbrowser
 
+httpx.Timeout(7)
+
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 with open(os.path.join(base_dir, 'config.json5'), 'r') as f:
@@ -165,7 +167,7 @@ class Bridge:
                     'grant_type': 'authorization_code',
                     'code': current_url.split('=')[1],
                     'redirect_uri': config['bangumiOauthApplication']['cb']
-                })
+                }, timeout=20)
                 if req.status_code == 200 and req.json().get('access_token') != None:
                     if current_mode == 'dev':
                         print('oauth登录成功')
@@ -318,7 +320,7 @@ class Bridge:
             
             req = httpx.get(url, headers={
                 'User-Agent': config['userAgent']
-            }, cookies=self.getCookiesAsObj())
+            }, cookies=self.getCookiesAsObj(), timeout=15)
             if req.status_code == 200:
                 return req.text
             else:
@@ -617,7 +619,7 @@ def quit_app(icon, item):
     icon.stop()
     if current_mode == 'dev':
         print('尝试调用sys.exit进行退出')
-    os._exit(0)
+    exit(0)
 
 
 def load_image():
