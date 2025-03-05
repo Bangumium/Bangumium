@@ -30,6 +30,8 @@ Pywebview + Vue.js
 
 **Windows 用户可能需要自行前往 [此处](https://developer.microsoft.com/en-us/microsoft-edge/webview2) 下载 Microsoft Edge Webview2 运行时才可以正常运行。**
 
+如果你使用 Arch Linux，可以使用 AUR 中的 `bangumium-bin` 包直接安装本软件。
+
 ## 参与开发
 
 ### 安装 NPM 和 PIP 依赖

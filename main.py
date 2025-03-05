@@ -619,6 +619,8 @@ def quit_app(icon, item):
     icon.stop()
     if current_mode == 'dev':
         print('尝试调用sys.exit进行退出')
+    os._exit(0)
+    sys.exit(0)
     exit(0)
 
 
