@@ -34,6 +34,12 @@ function loadAccountInfo() {
           accountInfo.value['is_logged_in'] = false
           window.location.reload()
         }
+
+        if(typeof(userInfoResult) === "undefined") {
+          // run into weird error, force reload required
+          window.location.reload()
+        }
+
         userInfo.value = userInfoResult
       })
     } else {

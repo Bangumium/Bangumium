@@ -14,7 +14,7 @@ from notifypy import Notify
 import threading
 import webbrowser
 
-httpx.Timeout(7)
+httpx.Timeout(15)
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -132,7 +132,7 @@ class Bridge:
     async def endBangumiLogin(self, bgm_login_window):
         try:
             self.loginAttempt = 'OPERATING'
-            await asyncio.sleep(5)
+            await asyncio.sleep(8)
             cookies = bgm_login_window.evaluate_js('document.cookie')
             if 'chii_auth' in cookies:
                 if current_mode == 'dev':
@@ -606,8 +606,10 @@ def toggle_window(icon, item):
     global main_window, is_main_window_shown
     if not is_main_window_shown:
         main_window.show()
+        is_main_window_shown = True
     else:
         main_window.hide()
+        is_main_window_shown = False;
 
 def quit_app(icon, item):
     global main_window

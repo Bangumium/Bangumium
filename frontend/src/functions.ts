@@ -2,8 +2,13 @@
 function execAfterPywebviewLoaded(func: () => void) {
   const interval_id = setInterval(() => {
     if (window.pywebview) {
-      clearInterval(interval_id);
-      func();
+      try {
+        func();
+        clearInterval(interval_id);
+      }
+      catch (e) {
+        console.error("[handled exception at execAfterPywebviewLoaded]" + e)
+      }
     }
   }, 100);
 }

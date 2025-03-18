@@ -28,9 +28,9 @@ Pywebview + Vue.js
 
 在 [GitHub Releases](https://github.com/Bangumium/Bangumium/releases) 下载编译完成的软件。
 
-**Windows 用户可能需要自行前往 [此处](https://developer.microsoft.com/en-us/microsoft-edge/webview2) 下载 Microsoft Edge Webview2 运行时才可以正常运行。**
+**Windows 11 以下的用户可能需要自行前往 [此处](https://developer.microsoft.com/en-us/microsoft-edge/webview2) 下载 Microsoft Edge Webview 2 运行时才可以正常运行。**
 
-如果你使用 Arch Linux，可以使用 AUR 中的 `bangumium-bin` 包直接安装本软件。
+如果你使用 Arch Linux，可以使用 AUR 中的 `bangumium-git` 包直接安装本软件。
 
 ## 参与开发
 
