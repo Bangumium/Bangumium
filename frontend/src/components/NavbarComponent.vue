@@ -35,7 +35,7 @@ function loadAccountInfo() {
           window.location.reload()
         }
 
-        if(typeof(userInfoResult) === "undefined") {
+        if(!userInfoResult) {
           // run into weird error, force reload required
           window.location.reload()
         }

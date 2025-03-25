@@ -75,8 +75,7 @@ async def execAfterLoggedIn(bgm_login_window, endBangumiLogin):
                 break
         except:
             break
-    if current_mode == 'dev':
-        print('满足登录完成判定条件，准备检查登录状态')
+        log('满足登录完成判定条件，准备检查登录状态')
     try:
         bgm_login_window.hide()
     except:
@@ -95,8 +94,7 @@ async def execAfterOauthComplete(bgm_login_window, endBangumiOauth, cookies):
         bgm_login_window.hide()
     except:
         pass
-    if current_mode == 'dev':
-        print('满足oauth完成判定条件，准备获取oauth结果')
+    log('满足oauth完成判定条件，准备获取oauth结果')
     await endBangumiOauth(bgm_login_window, cookies);
 
 class Bridge:
@@ -109,39 +107,33 @@ class Bridge:
         return config['appVersion']
     def startBangumiLogin(self):
         self.loginAttempt = 'PENDING'
-        if current_mode == 'dev':
-            print('开始尝试登录Bangumi')
+        log('开始尝试登录Bangumi')
         try:
             bgm_login_window = webview.create_window('Bangumi Login', 'https://bgm.tv/login')
             asyncio.run(execAfterLoggedIn(bgm_login_window, self.endBangumiLogin))
         except Exception as e:
             self.loginAttempt = 'FAILED'
-            if current_mode == 'dev':
-                print(e)
+            log(e)
     async def startBangumiOauth(self, bgm_login_window, cookies):
-        if current_mode == 'dev':
-            print('开始尝试oauth')
+        log('开始尝试oauth')
         try:
             bgm_login_window.load_url('https://bgm.tv/oauth/authorize?client_id='+config['bangumiOauthApplication']['app_id']+'&response_type=code')
             bgm_login_window.show()
             await execAfterOauthComplete(bgm_login_window, self.endBangumiOauth, cookies)
         except Exception as e:
             self.loginAttempt = 'FAILED'
-            if current_mode == 'dev':
-                print(e)
+            log(e)
     async def endBangumiLogin(self, bgm_login_window):
         try:
             self.loginAttempt = 'OPERATING'
             await asyncio.sleep(8)
             cookies = bgm_login_window.evaluate_js('document.cookie')
             if 'chii_auth' in cookies:
-                if current_mode == 'dev':
-                    print('cookies中存在chii_auth，登录成功，准备尝试oauth登录')
+                log('cookies中存在chii_auth，登录成功，准备尝试oauth登录')
                 self.loginAttempt = 'OAUTH_PENDING'
                 await self.startBangumiOauth(bgm_login_window, cookies)
             else:
-                if current_mode == 'dev':
-                    print('cookies中不存在chii_auth，登录失败')
+                log('cookies中不存在chii_auth，登录失败')
                 bgm_login_window.destroy()
                 self.loginAttempt = 'FAILED'
         except Exception as e:
@@ -150,8 +142,7 @@ class Bridge:
             except:
                 pass
             self.loginAttempt = 'FAILED'
-            if current_mode == 'dev':
-                print(e)
+            log(e)
     async def endBangumiOauth(self, bgm_login_window, cookies):
         global userData
         try:
@@ -159,8 +150,7 @@ class Bridge:
             await asyncio.sleep(5)
             current_url = bgm_login_window.get_current_url()
             if current_url.startswith(config['bangumiOauthApplication']['cb']):
-                if current_mode == 'dev':
-                    print('已获取到oauth code')
+                log('已获取到oauth code')
                 req = httpx.post('https://bgm.tv/oauth/access_token', data={
                     'client_id': config['bangumiOauthApplication']['app_id'],
                     'client_secret': config['bangumiOauthApplication']['app_secret'],
@@ -169,8 +159,7 @@ class Bridge:
                     'redirect_uri': config['bangumiOauthApplication']['cb']
                 }, timeout=20)
                 if req.status_code == 200 and req.json().get('access_token') != None:
-                    if current_mode == 'dev':
-                        print('oauth登录成功')
+                    log('oauth登录成功')
                     userData['is_logged_in'] = True
                     userData['cookies'] = cookies
                     userData['oauthToken'] = req.json().get('access_token')
@@ -179,13 +168,11 @@ class Bridge:
                     bgm_login_window.destroy()
                     self.loginAttempt = 'SUCCESS'
                 else:
-                    if current_mode == 'dev':
-                        print('oauth登录失败')
+                    log('oauth登录失败')
                     bgm_login_window.destroy()
                     self.loginAttempt = 'FAILED'
             else:
-                if current_mode == 'dev':
-                    print('oauth登录失败')
+                log('oauth登录失败')
                 bgm_login_window.destroy()
                 self.loginAttempt = 'FAILED'
                 
@@ -195,8 +182,7 @@ class Bridge:
             except:
                 pass
             self.loginAttempt = 'FAILED'
-            if current_mode == 'dev':
-                print(e)
+            log(e)
     def refreshToken(self):
         global userData
         req = httpx.post('https://bgm.tv/oauth/access_token', data={
@@ -217,8 +203,7 @@ class Bridge:
     def searchSubjectByKeyword(self, keyword):
         try:
             req = httpx.post('https://api.bgm.tv/v0/search/subjects', json={'keyword': keyword})
-            if current_mode == 'dev':
-                print(req.text)
+            log(req.text)
             if req.status_code == 200:
                 return req.json()
         except:
@@ -238,7 +223,7 @@ class Bridge:
     def sendGetReqToApi(self, url):
         req = self.sendGetReqToApiNoRetry(url)
         if 'error' in req:
-            for i in range(2):
+            for i in range(5):
                 req = self.sendGetReqToApiNoRetry(url)
                 if 'error' not in req:
                     return req
@@ -251,15 +236,14 @@ class Bridge:
             if req.status_code // 100 == 2:
                 return req.json()
             else:
-                if current_mode == 'dev':
-                    print(req.text)
+                log(req.text)
                 return {'error': req.text}
         except Exception as e:
             return {'error': str(e)}
     def sendPostReqToApi(self, url, data):
         req = self.sendPostReqToApiNoRetry(url, data)
         if 'error' in req:
-            for i in range(2):
+            for i in range(5):
                 req = self.sendPostReqToApiNoRetry(url, data)
                 if 'error' not in req:
                     return req
@@ -272,15 +256,14 @@ class Bridge:
             if req.status_code // 100 == 2:
                 return req.json()
             else:
-                if current_mode == 'dev':
-                    print(req.text)
+                log(req.text)
                 return {'error': req.text}
         except Exception as e:
             return {'error': str(e)}
     def sendPutReqToApi(self, url, data):
         req = self.sendPutReqToApiNoRetry(url, data)
         if 'error' in req:
-            for i in range(2):
+            for i in range(5):
                 req = self.sendPutReqToApiNoRetry(url, data)
                 if 'error' not in req:
                     return req
@@ -293,15 +276,14 @@ class Bridge:
             if req.status_code // 100 == 2:
                 return req.json()
             else:
-                if current_mode == 'dev':
-                    print(req.text)
+                log(req.text)
                 return {'error': req.text}
         except Exception as e:
             return {'error': str(e)}
     def sendPatchReqToApi(self, url, data):
         req = self.sendPatchReqToApiNoRetry(url, data)
         if 'error' in req:
-            for i in range(2):
+            for i in range(5):
                 req = self.sendPatchReqToApiNoRetry(url, data)
                 if 'error' not in req:
                     return req
@@ -502,6 +484,7 @@ class Bridge:
         
         if page == 1:
             if auto_trigger and userData.get('lastPullResult') != items[0].get('id') and userData.get('disableNotifications') != True:
+                log('开始尝试发送通知')
                 i = 0
                 while i < 3 and i < len(results):
                     notify = Notify()
@@ -511,7 +494,7 @@ class Bridge:
                     if userData.get('lastPullResult') == items[0].get('id'):
                         break
                     i += 1
-
+                log('通知发送完成')
             userData['lastPullResult'] = items[0].get('id')
             writeToUserData(userData)
 
@@ -541,8 +524,7 @@ class Bridge:
             'comment': comment,
             'private': isPrivate
         }
-        if current_mode == 'dev':
-            print(data)
+        log(data)
         result = self.sendPostReqToApi('https://api.bgm.tv/v0/users/-/collections/'+str(id), data)
         return result
     def getEpisodeStatusBySubjectId(self, id):
@@ -613,14 +595,11 @@ def toggle_window(icon, item):
 
 def quit_app(icon, item):
     global main_window
-    if current_mode == 'dev':
-        print('开始尝试销毁窗体')
+    log('开始尝试销毁窗体')
     main_window.destroy()
-    if current_mode == 'dev':
-        print('尝试关闭图标')
+    log('尝试关闭图标')
     icon.stop()
-    if current_mode == 'dev':
-        print('尝试调用sys.exit进行退出')
+    log('尝试调用sys.exit进行退出')
     os._exit(0)
     sys.exit(0)
     exit(0)
@@ -641,18 +620,9 @@ tray_icon.run_detached()
 
 # check timeline
 
-def fetch_timeline_periodically():
-    bridge = Bridge()
-    try:
-        bridge.getIndexTimeline(auto_trigger=True)
-    except Exception as e:
-        if current_mode == 'dev':
-            print("Error fetching timeline:", e)
-    timer = threading.Timer(300, fetch_timeline_periodically)
-    timer.daemon = True
-    timer.start()
-
-threading.Timer(300, fetch_timeline_periodically)
+def log(text: str):
+    if current_mode == 'dev' or sys.platform != 'win32':
+        print(text)
         
 is_main_window_shown = False
 

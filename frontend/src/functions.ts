@@ -104,6 +104,12 @@ async function setCurrentTheme(theme: string) {
   await applyCurrentTheme()
 }
 
+function triggerOnceTimelineCheck() {
+  window.pywebview.api.getIndexTimeline(1, true).then((res) => {
+    console.log(res);
+  })
+}
+
 export {
   getSubjectType,
   execAfterPywebviewLoaded,
@@ -111,5 +117,6 @@ export {
   getCurrentTheme,
   setCurrentTheme,
   applyCurrentTheme,
-  theme_list
+  theme_list,
+  triggerOnceTimelineCheck
 }
