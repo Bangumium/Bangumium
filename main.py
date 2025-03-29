@@ -7,14 +7,11 @@ import asyncio
 import httpx
 from bs4 import BeautifulSoup
 import re
-from googletrans import Translator
 from pystray import Icon, Menu, MenuItem
 from PIL import Image
 from notifypy import Notify
 import threading
 import webbrowser
-
-httpx.Timeout(15)
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -69,7 +66,7 @@ def writeToUserData(userData):
 
 async def execAfterLoggedIn(bgm_login_window, endBangumiLogin):
     while True:
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.2)
         try:
             if ('login' in bgm_login_window.get_current_url()) == False and ('FollowTheRabbit' in bgm_login_window.get_current_url()) == False:
                 break
@@ -84,7 +81,7 @@ async def execAfterLoggedIn(bgm_login_window, endBangumiLogin):
 
 async def execAfterOauthComplete(bgm_login_window, endBangumiOauth, cookies):
     while True:
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.2)
         try:
             if ('https://bgm.tv/oauth/' in bgm_login_window.get_current_url()) == False:
                 break
@@ -126,7 +123,6 @@ class Bridge:
     async def endBangumiLogin(self, bgm_login_window):
         try:
             self.loginAttempt = 'OPERATING'
-            await asyncio.sleep(8)
             cookies = bgm_login_window.evaluate_js('document.cookie')
             if 'chii_auth' in cookies:
                 log('cookies中存在chii_auth，登录成功，准备尝试oauth登录')
@@ -147,7 +143,6 @@ class Bridge:
         global userData
         try:
             self.loginAttempt = 'OPERATING_OAUTH'
-            await asyncio.sleep(5)
             current_url = bgm_login_window.get_current_url()
             if current_url.startswith(config['bangumiOauthApplication']['cb']):
                 log('已获取到oauth code')
@@ -512,8 +507,6 @@ class Bridge:
         self.userInfoCache['cacheOauthToken'] = None
         self.userInfoCache['username'] = None
         return True
-    def translateText(self, text):
-        return asyncio.run(Translator().translate(text, dest='zh-cn')).text
     def getCollectStatusBySubjectId(self, id):
         return self.sendGetReqToApi('https://api.bgm.tv/v0/users/'+str(self.userInfoCache['username'])+'/collections/'+str(id))
     def saveCollectStatus(self, id, status, rank, tags, comment, isPrivate):

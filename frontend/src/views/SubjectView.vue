@@ -26,25 +26,6 @@ execAfterPywebviewLoaded(() => {
   });
 });
 
-const translatedSummary = ref(null);
-const isTranslating = ref(false)
-
-function translateIntro() {
-  translatedSummary.value = "正在翻译...";
-  isTranslating.value = true
-  window.pywebview.api.translateText(subject.value.summary).then((result) => {
-    translatedSummary.value = result;
-  }).catch(() => {
-    translatedSummary.value = "翻译失败";
-  }).finally(() => {
-    isTranslating.value = false
-  });
-}
-
-function closeTranslation() {
-  translatedSummary.value = null;
-}
-
 const editCollectStatusModal = ref(null);
 
 
@@ -129,19 +110,6 @@ const meta_tags = ref([]);
           <EpStatus ref="epStatus"></EpStatus>
           <div>
             {{ subject.summary }}
-          </div>
-          <br />
-          <a class="link link-primary" @click="translateIntro" v-if="translatedSummary === null">翻译简介到中文</a>
-          <a class="link link-primary" @click="closeTranslation"
-            v-if="translatedSummary !== null && isTranslating === false">关闭翻译</a>
-          <br />
-          <div v-if="translatedSummary">
-            <br />
-            <div class="bg-base-200 border-xl border-2 rounded-lg p-4">
-              {{ translatedSummary }}
-              <br /><br />
-              <b v-if="isTranslating === false">以上翻译由 Google 翻译提供</b>
-            </div>
           </div>
           <br />
           <div class="px-4 py-4 bg-base-200 rounded-lg prose">
