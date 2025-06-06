@@ -52,7 +52,7 @@ jobs:
         # https://github.com/pygobject/pycairo/issues/386#issuecomment-2397660932
         # https://github.com/dlenski/gp-saml-gui/issues/101#issuecomment-2172468497
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt update && sudo apt-get install -y libcairo2-dev pkg-config python3-dev libgirepository1.0-dev glib-networking
+        run: sudo apt update && sudo apt-get install -y libcairo2-dev pkg-config python3-dev libgirepository1.0-dev glib-networking libgirepository-2.0-dev
 
       - name: Install Python Packages
         if: matrix.os == 'ubuntu-latest'
